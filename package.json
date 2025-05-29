@@ -1,0 +1,26 @@
+{
+  "name": "talentscope-ai",
+  "version": "1.0.0",
+  "description": "AI-powered automated candidate screening platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npm run dev:frontend & npm run dev:backend & npm run dev:ai",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:ai": "cd ai-service && python main.py",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "keywords": [
+    "ai",
+    "recruitment",
+    "video-interview",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT"
+} 

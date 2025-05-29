@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(HR)
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  HR
+  CANDIDATE
+}
+
+// Job Description model
+model JobDescription {
+  id           Int          @id @default(autoincrement())
+  title        String
+  department   String
+  location     String
+  experience   String
+  skills       String[]
+  description  String
+  requirements String
+  status       JobStatus    @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  interviews   Interview[]
+  candidates   Candidate[]  @relation("JobApplications")
+}
+
+enum JobStatus {
+  ACTIVE
+  DRAFT
+  CLOSED
+}
+
+// Candidate model
+model Candidate {
+  id             Int             @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email         String          @unique
+  phone         String?
+  experience    Int             // in years
+  skills        String[]
+  currentRole   String?
+  currentCompany String?
+  location      String
+  resumeUrl     String?
+  status        CandidateStatus @default(NEW)
+  appliedJobs   JobDescription[] @relation("JobApplications")
+  interviews    Interview[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+enum CandidateStatus {
+  NEW
+  SCREENING
+  INTERVIEWED
+  SELECTED
+  REJECTED
+}
+
+// Interview model
+model Interview {
+  id           Int             @id @default(autoincrement())
+  job          JobDescription  @relation(fields: [jobId], references: [id])
+  jobId        Int
+  candidate    Candidate       @relation(fields: [candidateId], references: [id])
+  candidateId  Int
+  status       InterviewStatus @default(SCHEDULED)
+  scheduledAt  DateTime
+  completedAt  DateTime?
+  duration     Int             // in minutes
+  score        Float?
+  feedback     String?
+  videoUrl     String?
+  questions    Question[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Question model
+model Question {
+  id          Int           @id @default(autoincrement())
+  interview   Interview     @relation(fields: [interviewId], references: [id])
+  interviewId Int
+  text        String
+  type        QuestionType
+  response    String?
+  score       Float?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum QuestionType {
+  TECHNICAL
+  BEHAVIORAL
+  EXPERIENCE
+} 
